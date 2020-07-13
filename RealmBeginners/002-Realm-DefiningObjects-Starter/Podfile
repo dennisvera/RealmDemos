@@ -1,0 +1,8 @@
+target 'Chatter' do
+  platform :ios, '10.0'
+  use_frameworks!
+
+  # ??
+  pod 'RealmSwift', '5.2.0'
+  pod 'Kingfisher', '5.14.1'
+end
