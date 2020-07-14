@@ -39,9 +39,9 @@ class FavoritesTableViewController: UITableViewController {
     super.viewDidLoad()
     
     let realm = try! Realm()
-    messages = realm.objects(Message.self)
-      .filter("isFavorite = true")
-      .sorted(byKeyPath: "timestamp", ascending: false)
+    let user = User.defaultUser(in: realm)
+    
+    messages = user.messages.filter("isFavorite = true")
   }
 
   override func viewWillAppear(_ animated: Bool) {

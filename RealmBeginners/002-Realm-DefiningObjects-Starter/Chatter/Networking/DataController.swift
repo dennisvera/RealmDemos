@@ -59,10 +59,12 @@ class DataController {
       }
       
       let realm = try! Realm()
+      let me = User.defaultUser(in: realm)
       try! realm.write {
-        realm.add(newMessages)
+        newMessages.forEach { message in
+          me.messages.insert(message, at: 0)
+        }
       }
-      
     }
   }
 
@@ -71,20 +73,30 @@ class DataController {
   func postMessage(_ message: String) {
     let realm = try! Realm()
     let user = User.defaultUser(in: realm)
-
-    let new = Message(user: user, message: message)
+    
+    let newMessage = Message(user: user, message: message)
     try! realm.write {
-      realm.add(new)
+      user.outgoing.append(newMessage)
     }
     
-
-    /* let newId = new.id
-     api.postMessage(new, completion: {[weak self] _ in
-     self?.didSentMessage(id: newId)
-     }) */
+    let newId = newMessage.id
+    api.postMessage(newMessage, completion: {[weak self] _ in
+      self?.didSentMessage(id: newId)
+    })
   }
 
   private func didSentMessage(id: String) {
-
+    let realm = try! Realm()
+    let user = User.defaultUser(in: realm)
+    
+    if let sentMessage = realm.object(ofType: Message.self, forPrimaryKey: id),
+      let index = user.outgoing.index(of: sentMessage) {
+      
+      try! realm.write {
+        user.outgoing.remove(at: index)
+        user.messages.insert(sentMessage, at: 0)
+        user.sent += 1
+      }
+    }
   }
 }

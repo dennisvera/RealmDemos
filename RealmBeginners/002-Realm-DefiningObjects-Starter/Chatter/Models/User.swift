@@ -42,6 +42,13 @@ class User: Object {
   @objc dynamic var name = ""
   @objc dynamic var sent = 0
   
+  // MARK: Collection Properties
+  
+  let messages = List<Message>()
+  let outgoing = List<Message>()
+  
+  // MARK: Public Properties
+  
   var avatarUrl: URL {
     return imageUrlForName(self.name)
   }
