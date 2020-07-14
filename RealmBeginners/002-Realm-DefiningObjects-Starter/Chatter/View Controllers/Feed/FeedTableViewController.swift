@@ -34,7 +34,12 @@ import RealmSwift
 class FeedTableViewController: UITableViewController {
 
   private var dataController: DataController!
+  private var messagesToken: NotificationToken?
   fileprivate var messages: List<Message>!
+  
+  deinit {
+    dataController.stopFetchingMessages()
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -43,17 +48,29 @@ class FeedTableViewController: UITableViewController {
     User.defaultUser(in: realm)
     
     messages = User.defaultUser(in: realm).messages
+    messagesToken = messages.observe { [weak self] notifications in
+      guard let strongself = self else { return }
+      guard let tableview = strongself.tableView else { return }
+      
+      switch notifications {
+      case .initial:
+        tableview.reloadData()
+      case .update(_, let deletions, let insertions, let modifications):
+        tableview.applyChanges(deletions: deletions, insertions: insertions, updates: modifications)
+      case .error:
+        break
+      }
+      
+      strongself.title = "Feed (\(strongself.messages.count))"
+    }
 
     dataController = DataController(api: StubbedChatterAPI())
     dataController.startFetchingMessages()
   }
-
-  @IBAction func refresh() {
-    tableView.reloadData()
-  }
-
-  deinit {
-    dataController.stopFetchingMessages()
+  
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    messagesToken?.invalidate()
   }
 
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

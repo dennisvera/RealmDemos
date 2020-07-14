@@ -34,25 +34,35 @@ import RealmSwift
 class FavoritesTableViewController: UITableViewController {
 
   fileprivate var messages: Results<Message>!
+  private var messagesToken: NotificationToken?
 
   override func viewDidLoad() {
     super.viewDidLoad()
     
     let realm = try! Realm()
     let user = User.defaultUser(in: realm)
-    
     messages = user.messages.filter("isFavorite = true")
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-
-    tableView.reloadData()
+    
+    messagesToken = messages?.observe { [weak self] changes  in
+      guard let tableView = self?.tableView else { return }
+      
+      switch changes {
+      case .initial:
+        tableView.reloadData()
+      case .update(_, let deletions, let insertions, let updates):
+        tableView.applyChanges(deletions: deletions, insertions: insertions, updates: updates)
+      case .error: break
+      }
+    }
   }
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
-
+    messagesToken?.invalidate()
   }
 
   // MARK: - table view methods
