@@ -3,6 +3,6 @@ target 'Chatter' do
   use_frameworks!
 
   # ??
-  pod 'RealmSwift', '5.2.0'
+  pod 'RealmSwift', '~> 3.20.0'
   pod 'Kingfisher', '5.14.1'
 end

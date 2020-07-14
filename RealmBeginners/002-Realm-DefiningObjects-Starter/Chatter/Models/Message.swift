@@ -35,13 +35,13 @@ class Message: Object {
   
   // MARK: - Persisted Properties
   
-  dynamic var id = UUID().uuidString
-  dynamic var message = ""
-  dynamic var name = ""
-  dynamic var isFavorite = false
-  dynamic var timeStamp = Date().timeIntervalSinceReferenceDate
+  @objc dynamic var id = UUID().uuidString
+  @objc dynamic var message = ""
+  @objc dynamic var name = ""
+  @objc dynamic var isFavorite = false
+  @objc dynamic var timestamp = Date().timeIntervalSinceReferenceDate
   
-  // MARK: - Properties
+  // MARK: - Public Properties
   
   var photoUrl: URL {
     return imageUrlForName(self.name)
@@ -55,8 +55,8 @@ class Message: Object {
     self.message = message
   }
   
-  // MARK: - Override Methods
-
+  // MARK: - Overrides
+  
   override static func primaryKey() -> String? {
     return "id"
   }

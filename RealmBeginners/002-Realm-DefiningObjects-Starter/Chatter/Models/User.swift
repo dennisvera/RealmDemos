@@ -36,31 +36,42 @@ func imageUrlForName(_ name: String) -> URL {
 }
 
 class User: Object {
-
+  
   // MARK: - Persisted Properties
   
-  dynamic var name = ""
-  dynamic var sent = 0
-  
-  // MARK: - Properties
+  @objc dynamic var name = ""
+  @objc dynamic var sent = 0
   
   var avatarUrl: URL {
     return imageUrlForName(self.name)
   }
   
-  // MARK: - Initilization
+  // MARK: - Initialization
   
   convenience init(name: String) {
     self.init()
     self.name = name
   }
-
-  // MARK: - Override Methods
   
-  override class func primaryKey() -> String? {
+  // MARK: - Overrides
+  
+  override static func primaryKey() -> String? {
     return "name"
   }
-
+  
   // MARK: - Helper Methods
-
+  
+  private static func createDefaultUser(in realm: Realm) -> User {
+    let me = User(name: "me")
+    try! realm.write {
+      realm.add(me)
+    }
+    return me
+  }
+  
+  @discardableResult
+  static func defaultUser(in realm: Realm) -> User {
+    return realm.object(ofType: User.self, forPrimaryKey: "me")
+      ?? createDefaultUser(in: realm)
+  }
 }

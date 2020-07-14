@@ -38,6 +38,9 @@ class FeedTableViewController: UITableViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    
+    let realm = try! Realm()
+    User.defaultUser(in: realm)
 
     dataController = DataController(api: StubbedChatterAPI())
     dataController.startFetchingMessages()
@@ -59,6 +62,7 @@ class FeedTableViewController: UITableViewController {
 }
 
 //MARK: - Tableview methods
+
 extension FeedTableViewController {
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return messages.count
