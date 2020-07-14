@@ -33,16 +33,21 @@ import RealmSwift
 
 class FavoritesTableViewController: UITableViewController {
 
-  fileprivate var messages = [Message]()
+  fileprivate var messages: Results<Message>!
 
   override func viewDidLoad() {
     super.viewDidLoad()
-
+    
+    let realm = try! Realm()
+    messages = realm.objects(Message.self)
+      .filter("isFavorite = true")
+      .sorted(byKeyPath: "timestamp", ascending: false)
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
 
+    tableView.reloadData()
   }
 
   override func viewWillDisappear(_ animated: Bool) {

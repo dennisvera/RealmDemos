@@ -34,13 +34,16 @@ import RealmSwift
 class FeedTableViewController: UITableViewController {
 
   private var dataController: DataController!
-  fileprivate var messages = [Message]()
+  fileprivate var messages: Results<Message>!
 
   override func viewDidLoad() {
     super.viewDidLoad()
     
     let realm = try! Realm()
     User.defaultUser(in: realm)
+    
+    messages = realm.objects(Message.self)
+      .sorted(byKeyPath: "timestamp", ascending: false)
 
     dataController = DataController(api: StubbedChatterAPI())
     dataController.startFetchingMessages()
